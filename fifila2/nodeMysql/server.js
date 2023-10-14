@@ -31,16 +31,6 @@ server.listen(8085 , function check(error){
 
  // add a record
 server.post("/api/product/add", (req , res)=>{
-    // let details ={
-    //     name:"etyy",
-    //     qty_crt: req.body.qty_crt,
-    //     emp_id:req.body.emp_id,
-    //     categoryId:req.body.categoryId,
-    //     storeID:req.body.storeID,
-    //     qty_pcs:req.body.qty_pcs,
-    //     soldQty:req.body.soldQty,
-    //     currentQty:req.body.currentQty
-    // };
     let sql = "INSERT INTO `product`(name,qty_crt,categoryName,storeId,qty_pcs) VALUES ('"+ req.body.name +"','"+ req.body.qty_crt +"','"+ req.body.categoryId +"','"+ req.body.storeID +"','"+ req.body.qty_pcs +"')";
     db.query(sql,(error)=>{
         if(error){
@@ -93,6 +83,8 @@ server.get("/api/category" , (req,res)=>{
     });
 });
 
+
+
 // update record
 server.put("/api/product/:id" , (req,res)=>{
     let sql = 
@@ -128,35 +120,44 @@ server.delete("/api/product/delete/:id" ,(req,res) =>{
             res.send({status:true , message:"product deleted successfully"});
     });
 });
+
+
 let rowexists = (req , to) => {
-    // Return a new promise
       // Create the sql query (this uses placeholders)
-      // Hard coded values don't need to be placeholders but just for example:
-      let sql = "SELECT 1 FROM `product` WHERE name  = '"+req.params.name +"' and storeId = '"+to +"'";
+      let sql = "SELECT 1 FROM `product` WHERE name  = '"+req.params.name +"' and storeId = '"+ to +"'";
+      console.log(to);
       // Query the database replacing the ?? and ? with actual data
       db.query(sql,function(error, result, field){
         // Result will either be undefined or a row.
         // Convert it to a boolean and return it.
         if(result[0] === undefined){
-                let sql = "INSERT INTO `product`(name,qty_crt,categoryName,storeId,qty_pcs) VALUES ('"+ req.params.name +"','"+ req.body.cty +"','"+ req.body.category_Name +"','"+ req.params.to +"','"+ req.body.qty_pcs +"')";
-                db.query(sql,(error , res )=>{
+                console.log("not found " , result );
+            let sql = "INSERT INTO `product`(name,qty_crt,categoryName,storeId,qty_pcs) VALUES ('"+ req.params.name +"','"+ req.body.cty +"','"+ req.body.category_Name +"','"+ to +"','"+ req.body.qty_pcs +"')";
+            db.query(sql,(error , res )=>{
                     if(error){
                         console.log(error.message);
                     }
                     else{
+                        
                     }
                 })
-                  }
+            }
                   
         else {
-            console.log(result , "found");
-        }
+            let sql1 = "UPDATE product SET qty_crt = '"+ req.body.currentQty +"' where storeId = '"+req.params.storeId+"'"
+            db.query(sql1,(error , res)=>{
+                if (error){
+                    console.log(error.message);
+                }
+                let sql2 = "UPDATE product SET qty_crt = '"+ req.body.cty +"' where storeId = '"+to+"'"
+                    db.query(sql2);
+                    console.log("found");
+            })}
       });
   }
   
   // Get the data
 // order
-server.get("/api/orders/:id/:storeId/:to/:name" , (req , res)=>{
+server.put("/api/orders/:id/:storeId/:to/:name" , (req , res)=>{
     rowexists(req , req.params.to)
-
 });
